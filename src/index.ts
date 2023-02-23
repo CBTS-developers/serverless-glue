@@ -13,7 +13,7 @@ class GluePlugin {
     this.configGlueSchema();
 
     this.hooks = {
-      "aws:deploy:finalize:cleanup":
+      "aws:package:finalize:mergeCustomProviderResources":
         this.deploy.bind(this),
     };
   }
