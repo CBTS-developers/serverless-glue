@@ -15,12 +15,19 @@ class GluePlugin {
     this.hooks = {
       "aws:package:finalize:mergeCustomProviderResources":
         this.deploy.bind(this),
+      "after:deploy:finalize":
+        this.uploadScripts.bind(this)
     };
   }
 
   async deploy() {
     const service = new ServerlessService(this.serverless);
     await service.main();
+  }
+
+  async uploadScripts() {
+    const service = new ServerlessService(this.serverless);
+    await service.uploadScripts();
   }
 
   configGlueSchema() {

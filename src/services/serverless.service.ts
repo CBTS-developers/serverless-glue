@@ -24,6 +24,20 @@ export class ServerlessService {
     this.glueHelper = new GlueHelper(this.config);
   }
 
+  async uploadScripts() {
+    if (!this.config?.jobs) {
+      this.helperless.log("Jobs not found.");
+      return;
+    }
+    
+    let jobs = this.glueHelper.getGlueJobs();
+    for (const job of jobs) {
+      await this.uploadJobScripts(job);
+      await this.uploadSupportFiles(job);
+    }
+    return;
+  }
+
   async main() {
     if (!this.config) {
       this.helperless.log("Glue Config Not Found.");
@@ -70,8 +84,8 @@ export class ServerlessService {
     }
 
     for (const job of jobs) {
-      await this.uploadJobScripts(job);
-      await this.uploadSupportFiles(job);
+      // await this.uploadJobScripts(job);
+      // await this.uploadSupportFiles(job);
       const jobCFId = job.id ?? StringUtils.toPascalCase(job.name);
       const jobCFTemplate = CloudFormationUtils.glueJobToCF(job);
       this.helperless.appendToTemplate(
