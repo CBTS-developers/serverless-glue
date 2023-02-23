@@ -86,6 +86,16 @@ export class ServerlessService {
     for (const job of jobs) {
       // await this.uploadJobScripts(job);
       // await this.uploadSupportFiles(job);
+
+      // set job script locations
+      const fileName = path.parse(job.scriptPath).base;
+      const params = {
+        Bucket: this.config.bucketDeploy,
+        Body: readFileSync(path.join(job.scriptPath)),
+        Key: `${this.config?.s3Prefix ?? "glueJobs/"}${fileName}`,
+      };
+      job.setScriptS3Location(`s3://${params.Bucket}/${params.Key}`);
+      
       const jobCFId = job.id ?? StringUtils.toPascalCase(job.name);
       const jobCFTemplate = CloudFormationUtils.glueJobToCF(job);
       this.helperless.appendToTemplate(
@@ -139,7 +149,7 @@ export class ServerlessService {
       Key: `${this.config?.s3Prefix ?? "glueJobs/"}${fileName}`,
     };
     await this.awsHelper.uploadFileToS3(params);
-    job.setScriptS3Location(`s3://${params.Bucket}/${params.Key}`);
+    // job.setScriptS3Location(`s3://${params.Bucket}/${params.Key}`);
   }
 
   async uploadSupportFiles(job: GlueJob) {
